@@ -29,7 +29,7 @@ const IMG = {
     process: "/images/page/process-img-m.png",
     finalLeft: "/images/page/cta-vec-img2.png",
     finalRight: "/images/page/cta-vec-img1.png",
-    popup: "/images/page/popup-img.png", // ← replace with your popup character image
+    popup: "/images/page/popup-new-side-img.png", // ← replace with your popup character image
 };
 
 /* ══════════════════════════════════════════════════════════════
@@ -931,7 +931,7 @@ export default function ChildLandingPage() {
                 .cb-pop-art { position: relative; height: 460px; margin-left: -60px; align-self: center; z-index: 1; }
                 .cb-pop-panel {
                     position: absolute; top: -40px; right: 0; width: 290px; height: 400px; border-radius: 4px;
-                    background: var(--ink); border: 1px solid rgba(232,57,29,0.35);
+                    background: #A22E1E; border: 1px solid rgba(232,57,29,0.35);
                     background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 18px 18px;
                     box-shadow: 0 30px 70px rgba(0,0,0,0.35);
                 }
