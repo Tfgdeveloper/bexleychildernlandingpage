@@ -192,11 +192,11 @@ const agencyFeatures = [
     { icon: Timer, title: "4–7 Days Project Completion" },
 ];
 
-const categories = ["Children", "Comic", "Book Illustration", "Animals", "Fantasy", "Portrait", "Psychedelic", "Retro"];
+const categories = ["Children", "Book Covers", "Book Illustration", "Animals", "Fantasy", "Portrait"];
 const slug = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
 // Put files at /public/images/children/portfolio/<category>-<n>.webp  e.g. children-1.webp
 const portfolio: Record<string, string[]> = Object.fromEntries(
-    categories.map((c) => [c, Array.from({ length: c === "Children" ? 12 : 8 }, (_, i) => `/images/children/portfolio/${slug(c)}-${i + 1}.webp`)])
+    categories.map((c) => [c, Array.from({ length: c === "Children" ? 8 : 8 }, (_, i) => `/images/children/portfolio/${slug(c)}-${i + 1}.jpg`)])
 );
 
 const whyCards = [
@@ -455,7 +455,7 @@ function Testimonials() {
                     <span className="cb-tp-label">{TRUST.label}</span>
                     <TrustStars rating={5} size={30} />
                     <span className="cb-tp-meta">Rated <strong>{TRUST.score}</strong> / 5 based on <strong>{TRUST.reviews} reviews</strong></span>
-                    <span className="cb-tp-brand"><Star size={20} fill="#e8391d" stroke="#e8391d" /> Trustpilot</span>
+                    <span className="cb-tp-brand"><Star size={20} fill="#03D389" stroke="#03D389" /> Trustpilot</span>
                 </motion.div>
 
                 <div className="cb-slider">
@@ -783,8 +783,8 @@ export default function ChildLandingPage() {
                 .cb-band-row { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
                 .cb-band-call { color: rgba(255,255,255,0.85); font-size: 14px; }
                 .cb-band-call strong { color: white; font-weight: 900; }
-                .cb-band-img { align-self: end; height: 320px; display: flex; align-items: flex-end; justify-content: center; }
-                .cb-band-img img { max-height: 100%; max-width: 100%; object-fit: contain; }
+                .cb-band-img { align-self: end; height: 320px;  display: flex; align-items: flex-end; justify-content: center; }
+                .cb-band-img img { max-height: 100%; max-width: 100%; object-fit: cover; }
                 .cb-band-img .cb-ph { height: 260px; border-radius: 24px 24px 0 0; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
 
                 /* ═══ PORTFOLIO ═══ */
@@ -840,7 +840,7 @@ export default function ChildLandingPage() {
                 /* Trustpilot-style stars (brand red) */
                 .cb-tp-stars { display: inline-flex; gap: 3px; }
                 .cb-tp-star { display: inline-flex; align-items: center; justify-content: center; background: #dcdce6; border-radius: 2px; }
-                .cb-tp-star.on { background: var(--red); }
+                .cb-tp-star.on { background: #03D389; }
 
                 /* Summary bar */
                 .cb-tp-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 20px; margin: -16px auto 48px; padding: 18px 28px; max-width: 860px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; }
@@ -853,12 +853,12 @@ export default function ChildLandingPage() {
                 .cb-tp-card { height: 100%; display: flex; flex-direction: column; background: white; border-radius: 10px; padding: 26px; border: 1px solid #e5e5ec; transition: box-shadow 0.35s ease, transform 0.35s ease; }
                 .cb-tp-card:hover { box-shadow: 0 18px 40px rgba(0,0,0,0.35); transform: translateY(-3px); }
                 .cb-tp-head { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid #efeff4; }
-                .cb-tp-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(232,57,29,0.12); color: var(--red); font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+                .cb-tp-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(110, 39, 28, 0.12); color: #03D389; font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
                 .cb-tp-name { font-weight: 800; font-size: 15px; color: #191919; }
                 .cb-tp-loc { font-size: 12px; color: #6c6c85; margin-top: 2px; }
                 .cb-tp-rowline { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
                 .cb-tp-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #6c6c85; }
-                .cb-tp-verified svg { color: var(--red); }
+                .cb-tp-verified svg { color: #03D389; }
                 .cb-tp-title { font-weight: 800; font-size: 16px; color: #191919; margin-bottom: 8px; line-height: 1.35; }
                 .cb-tp-text { color: #3f3f55; font-size: 14.5px; line-height: 1.7; flex: 1; }
                 .cb-tp-date { font-size: 12px; color: #6c6c85; margin-top: 18px; padding-top: 14px; border-top: 1px solid #efeff4; }
