@@ -3,9 +3,8 @@ import { ChangeEvent, FormEvent, ReactNode, useEffect, useRef, useState } from "
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useInView, Variants } from "framer-motion";
 import {
-    ArrowRight, MessageCircle, Phone, Mail, MapPin, Send, Star, X, Loader2, BadgeCheck, AlertCircle,
-    ShieldCheck, Users, Wallet, Timer, RefreshCw, Lightbulb, Clock, LayoutGrid, Award, ImageIcon, Sparkles,
-    Globe,
+    ArrowRight, MessageCircle, Phone, Mail, MapPin, Send, Star, X, Loader2, AlertCircle,
+    ShieldCheck, Wallet, Timer, RefreshCw, Lightbulb, Clock, Award, ImageIcon, Sparkles, Palette, FileCheck,
 } from "lucide-react";
 import CallBar from "./CallBar";
 
@@ -188,50 +187,59 @@ function Img({ src, alt, className = "" }: { src: string; alt: string; className
    DATA
 ══════════════════════════════════════════════════════════════ */
 const agencyFeatures = [
-    { icon: ShieldCheck, title: "AUTHOR OWNERSHIP" },
-    { icon: Users, title: "PUBLISHING SUPPORT" },
-    { icon: Wallet, title: "PRINT & EBOOK SETUP" },
-    { icon: Globe, title: "GLOBAL DISTRIBUTION" },
+    { icon: ShieldCheck, title: "100% Ownership" },
+    { icon: RefreshCw, title: "Revisions Included" },
+    { icon: Palette, title: "Child-Friendly Art Styles" },
+    { icon: FileCheck, title: "Publishing-Ready Files" },
 ];
 
-const categories = ["Children", "Book Covers", "Book Illustration", "Animals", "Fantasy", "Portrait"];
-const slug = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
-// Put files at /public/images/children/portfolio/<category>-<n>.webp  e.g. children-1.webp
+/* Tab labels can change freely — `slug` matches your existing image file names, so keep it as is.
+   Images: /public/images/children/portfolio/<slug>-<n>.jpg  e.g. children-1.jpg */
+const categories = [
+    { label: "Children's Books", slug: "children" },
+    { label: "Book Covers", slug: "book-covers" },
+    { label: "Storybook Illustrations", slug: "book-illustration" },
+    { label: "Animals", slug: "animals" },
+    { label: "Fantasy", slug: "fantasy" },
+    { label: "Portraits", slug: "portrait" },
+];
 const portfolio: Record<string, string[]> = Object.fromEntries(
-    categories.map((c) => [c, Array.from({ length: c === "Children" ? 8 : 8 }, (_, i) => `/images/children/portfolio/${slug(c)}-${i + 1}.jpg`)])
+    categories.map((c) => [c.slug, Array.from({ length: 8 }, (_, i) => `/images/children/portfolio/${c.slug}-${i + 1}.jpg`)])
 );
 
 const whyCards = [
-    { icon: RefreshCw, title: "COMPLETE PUBLISHING SUPPORT", desc: "Get guidance through each stage of the publishing process, from manuscript preparation to final release." },
-    { icon: Wallet, title: "AFFORDABLE PACKAGES", desc: "Choose a publishing solution designed around your book, goals, and budget." },
-    { icon: Lightbulb, title: "PROFESSIONAL BOOK SETUP", desc: "We prepare your interior, cover, metadata, and publishing files to meet professional standards." },
-    { icon: Clock, title: "FAST TURNAROUND", desc: "Our streamlined process helps move your book toward publication without unnecessary delays." },
-    { icon: LayoutGrid, title: "PRINT & EBOOK OPTIONS", desc: "Publish your children’s book in print and digital formats so readers can enjoy it their way." },
-    { icon: Award, title: "AUTHOR OWNERSHIP", desc: "You retain ownership of your book and approved publishing files once your project is completed." },
+    { icon: RefreshCw, title: "Unlimited Revisions", desc: "We refine your illustrations with your feedback until every scene and character feels right." },
+    { icon: Wallet, title: "Flexible Pricing", desc: "Choose an illustration package that fits your budget, page count, and creative requirements." },
+    { icon: Lightbulb, title: "Original Artwork", desc: "Every illustration is created to match your story, characters, tone, and visual direction." },
+    { icon: Clock, title: "Fast Turnaround", desc: "Clear timelines and an organized process help keep your project moving without unnecessary delays." },
+    { icon: Palette, title: "Multiple Art Styles", desc: "From playful cartoons to detailed storybook art, we adapt the visual style to suit your book." },
+    { icon: Award, title: "100% Ownership", desc: "Once the project is complete, you receive full ownership of the approved artwork and final files." },
 ];
 
 const processSteps = [
-    { step: "01", title: "SHARE YOUR BOOK", desc: "Send us your manuscript, illustrations, cover files, and publishing goals. We’ll review everything and guide you on the next steps." },
-    { step: "02", title: "PREPARE YOUR BOOK", desc: "Our team formats your interior, checks your files, prepares the cover, and organizes the details needed for publication." },
-    { step: "03", title: "REVIEW & APPROVE", desc: "You review the publishing-ready files and request any necessary adjustments before the book moves forward." },
-    { step: "04", title: "PUBLISH & DISTRIBUTE", desc: "Once approved, we help prepare your book for print, digital release, and wider distribution across supported publishing channels." },
+    { step: "01", title: "Share Your Vision", desc: "Tell us about your story, characters, audience, preferred art style, and any ideas you already have in mind." },
+    { step: "02", title: "Review Your First Concepts", desc: "Our illustrators create initial sketches and visual concepts so you can see how your characters and scenes are taking shape." },
+    { step: "03", title: "Refine The Artwork", desc: "Share your feedback and we'll revise the illustrations, colors, expressions, and details until everything feels right." },
+    { step: "04", title: "Receive Final Files", desc: "Once approved, your completed illustrations are prepared in high-resolution, publishing-ready formats for print and digital use." },
 ];
 
-const TRUST = { score: "4.9", label: "Excellent", reviews: "300+" };
+/* Rating strip: only set `verified: true` once you have a real, verifiable Trustpilot score.
+   While it's false, the strip shows the "Client Feedback" line instead of a rating and review count. */
+const TRUST = { verified: false, label: "Excellent", score: "4.9", reviews: "300+" };
 
 const testimonials = [
-    { name: "Priya Nair", location: "US", date: "Aug 14, 2026", rating: 5, title: "Publishing Felt Much Easier", quote: "I had no idea where to begin with publishing my children’s book, but the process was explained clearly from the start. Everything felt organized, and I always knew what was happening next." },
-    { name: "Samantha Thornhill", location: "GB", date: "Jul 29, 2026", rating: 5, title: "Professional and Supportive", quote: "The team helped prepare my files, guided me through the publishing requirements, and answered every question I had. I felt supported throughout the entire project." },
-    { name: "Marcus Webb", location: "US", date: "Jul 10, 2026", rating: 5, title: "My Book Was Finally Ready for Readers", quote: "After months of working on my manuscript, it was exciting to see it turned into a professionally prepared book. The final files looked polished and ready for publication." },
-    { name: "Rachel Bennett", location: "CA", date: "Jun 22, 2026", rating: 5, title: "A Smooth Publishing Experience", quote: "I appreciated how simple the process was. The team handled the technical details while keeping me involved in all the important decisions." },
-    { name: "Daniel Carter", location: "AU", date: "Jun 03, 2026", rating: 5, title: "Clear Communication From Start to Finish", quote: "Every stage was explained properly, from formatting to final approval. Communication was consistent, and the project moved forward without unnecessary confusion." },
-    { name: "Olivia Morgan", location: "AU", date: "Jun 03, 2026", rating: 5, title: "Exactly the Support I Needed", quote: "As a first-time children’s author, I needed guidance more than anything. The team helped me understand the publishing process and made everything feel manageable." },
-    { name: "Jennifer Collins", location: "AU", date: "Jun 03, 2026", rating: 5, title: "My Book Looked Professional", quote: "The formatting, final setup, and overall presentation made a huge difference. Seeing my manuscript transformed into a polished book was incredibly rewarding." },
-    { name: "Ethan Brooks", location: "AU", date: "Jun 03, 2026", rating: 5, title: "Helpful at Every Stage", quote: "From reviewing my materials to preparing the final publishing files, the team stayed responsive and helpful. I never felt like I was figuring everything out alone." },
-    { name: "Megan Foster", location: "AU", date: "Jun 03, 2026", rating: 5, title: "A Great Experience for a First-Time Author", quote: "I was nervous about publishing for the first time, but the process was much more straightforward than I expected. The final result looked professional, and I was very happy with how everything came together." },
+    { name: "Priya Nair", rating: 5, title: "Exactly What I Imagined", quote: "From the first sketch to the final artwork, the team understood exactly what I wanted. The characters felt expressive, the colors were beautiful, and every revision was handled with care." },
+    { name: "Samantha Thornhill", rating: 5, title: "Smooth and Stress-Free Process", quote: "I was unsure about the illustration process at first, but everything was explained clearly. The sketches arrived quickly, feedback was easy, and the final pages looked wonderful." },
+    { name: "Marcus Webb", rating: 5, title: "My Story Finally Came to Life", quote: "The illustrations gave my story the personality it was missing. The characters looked engaging, the scenes felt imaginative, and the finished artwork exceeded my expectations." },
+    { name: "Rachel Bennett", rating: 5, title: "Wonderful Attention to Detail", quote: "Every little detail mattered to me, especially the facial expressions and backgrounds. The illustrator listened carefully and made thoughtful improvements throughout the project." },
+    { name: "Daniel Carter", rating: 5, title: "Professional From Start to Finish", quote: "Communication was clear, deadlines were handled professionally, and the artwork was delivered in a format that was ready for publishing. The entire experience was very straightforward." },
+    { name: "Olivia Morgan", rating: 5, title: "Perfect for My Children's Book", quote: "I wanted something playful, warm, and colorful, and that is exactly what I received. The illustrations fit the tone of my story beautifully and made the book feel complete." },
+    { name: "Jennifer Collins", rating: 5, title: "They Really Listened to My Ideas", quote: "I had a very specific vision for my characters, and the team took the time to understand it. The revisions were thoughtful, and the final result stayed true to my original concept." },
+    { name: "Ethan Brooks", rating: 5, title: "Great Creative Collaboration", quote: "The team brought fresh ideas while still respecting the direction of my manuscript. I especially liked how they improved the scenes without changing the personality of the story." },
+    { name: "Megan Foster", rating: 5, title: "Beautiful Final Artwork", quote: "The finished illustrations were polished, expressive, and full of character. Seeing the complete pages for the first time was exciting, and I was very happy with the final result." },
 ];
 
-/* Trustpilot-style square star blocks, in the brand red */
+/* Trustpilot-style square star blocks */
 function TrustStars({ rating, size = 22 }: { rating: number; size?: number }) {
     return (
         <div className="cb-tp-stars" aria-label={`Rated ${rating} out of 5`}>
@@ -326,12 +334,12 @@ function LeadForm() {
             transition={{ duration: 0.9, delay: 0.4, ease: smoothEase }}
         >
             <span className="cb-form-dot d1" /><span className="cb-form-dot d2" /><span className="cb-form-dot d3" />
-            <p className="cb-form-title">LIMITED TIME OFFER — <span>50% Off</span></p>
+            <p className="cb-form-title">Limited Time Offer — <span>50% Off</span></p>
             <form onSubmit={submit} className="cb-form">
-                <input name="name" type="text" placeholder="Your name" required aria-label="Your name" value={form.name} onChange={handle} disabled={loading} />
-                <input name="email" type="email" placeholder="Your email" required aria-label="Your email" value={form.email} onChange={handle} disabled={loading} />
-                <input name="phone" type="tel" placeholder="Your phone number" required aria-label="Your phone number" value={form.phone} onChange={handle} disabled={loading} />
-                <textarea name="message" rows={3} placeholder="Tell us about your book" aria-label="Tell us about your book" value={form.message} onChange={handle} disabled={loading} />
+                <input name="name" type="text" placeholder="Your Name" required aria-label="Your Name" value={form.name} onChange={handle} disabled={loading} />
+                <input name="email" type="email" placeholder="Your Email" required aria-label="Your Email" value={form.email} onChange={handle} disabled={loading} />
+                <input name="phone" type="tel" placeholder="Your Phone Number" required aria-label="Your Phone Number" value={form.phone} onChange={handle} disabled={loading} />
+                <textarea name="message" rows={3} placeholder="Tell Us About Your Book" aria-label="Tell Us About Your Book" value={form.message} onChange={handle} disabled={loading} />
                 <button type="submit" className="cb-btn cb-btn-primary cb-btn-block" disabled={loading}>
                     {loading ? <><Loader2 size={16} className="cb-spin" /> Sending…</> : <>Claim My Discount <Send size={15} /></>}
                 </button>
@@ -344,7 +352,7 @@ function LeadForm() {
 /* ══════════════════════════════════════════════════════════════
    CTA BAND (used twice)
 ══════════════════════════════════════════════════════════════ */
-function CtaBand({ line, image, imageAlt }: { line: string; image: string; imageAlt: string }) {
+function CtaBand({ line, title, image, imageAlt }: { line: string; title: string; image: string; imageAlt: string }) {
     return (
         <section className="cb-band">
             <div className="cb-band-bg" aria-hidden="true" />
@@ -353,13 +361,13 @@ function CtaBand({ line, image, imageAlt }: { line: string; image: string; image
             <div className="cb-band-inner">
                 <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="cb-band-content">
                     <motion.p variants={fadeUp} className="cb-band-line">{line}</motion.p>
-                    <motion.h2 variants={maskReveal} className="cb-band-h2">LET’S PUBLISH YOUR BOOK!</motion.h2>
+                    <motion.h2 variants={maskReveal} className="cb-band-h2">{title}</motion.h2>
                     <motion.div variants={fadeUp} className="cb-band-row">
                         <div className="cb-actions">
                             <button type="button" className="cb-btn cb-btn-dark" onClick={getStarted}>Get Started <ArrowRight size={16} /></button>
                             <button type="button" className="cb-btn cb-btn-ghost" onClick={openLiveChat}><MessageCircle size={16} /> Live Chat</button>
                         </div>
-                        <a href={BRAND.phoneHref} className="cb-band-call">Call us at: <strong>{BRAND.phone}</strong></a>
+                        <a href={BRAND.phoneHref} className="cb-band-call">Call Us: <strong>{BRAND.phone}</strong></a>
                     </motion.div>
                 </motion.div>
                 <motion.div
@@ -378,27 +386,28 @@ function CtaBand({ line, image, imageAlt }: { line: string; image: string; image
    PORTFOLIO
 ══════════════════════════════════════════════════════════════ */
 function Portfolio() {
-    const [active, setActive] = useState(categories[0]);
+    const [active, setActive] = useState(categories[0].slug);
+    const activeLabel = categories.find((c) => c.slug === active)?.label ?? "";
     const items = portfolio[active].slice(0, 12);
     return (
         <section id="portfolio" className="cb-portfolio">
             <div className="cb-inner">
                 <div className="cb-section-head center">
-                    <Eyebrow center>OUR PUBLISHED WORK</Eyebrow>
+                    <Eyebrow center>Our Portfolio</Eyebrow>
                     <motion.h2 variants={maskReveal} initial="hidden" whileInView="visible" viewport={{ once: true }} className="cb-h2">
-                        CHILDREN’S BOOKS <span className="accent">WE’VE HELPED PUBLISH</span>
+                        EXPLORE OUR CREATIVE <span className="accent">BOOK ILLUSTRATIONS</span>
                     </motion.h2>
-                    <p className="cb-sub">Explore a selection of children’s books prepared for professional publishing. From storybooks and picture books to educational titles, we help authors turn finished manuscripts into polished books ready for readers.</p>
+                    <p className="cb-sub">Take a look at some of the stories we've helped bring to life through custom artwork, expressive characters, and imaginative visual storytelling.</p>
                 </div>
 
                 <div className="cb-tabs" role="tablist" aria-label="Illustration categories">
                     {categories.map((c) => (
                         <button
-                            key={c} type="button" role="tab" aria-selected={active === c}
-                            className={`cb-tab ${active === c ? "active" : ""}`} onClick={() => setActive(c)}
+                            key={c.slug} type="button" role="tab" aria-selected={active === c.slug}
+                            className={`cb-tab ${active === c.slug ? "active" : ""}`} onClick={() => setActive(c.slug)}
                         >
-                            {c}
-                            {active === c && <motion.span layoutId="cb-tab-pill" className="cb-tab-pill" transition={{ duration: 0.4, ease: smoothEase }} />}
+                            {c.label}
+                            {active === c.slug && <motion.span layoutId="cb-tab-pill" className="cb-tab-pill" transition={{ duration: 0.4, ease: smoothEase }} />}
                         </button>
                     ))}
                 </div>
@@ -411,8 +420,8 @@ function Portfolio() {
                                 initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.92 }}
                                 transition={{ duration: 0.45, delay: i * 0.03, ease: smoothEase }}
                             >
-                                <Img src={src} alt={`${active} illustration ${i + 1}`} />
-                                <div className="cb-gallery-overlay"><span>{active}</span></div>
+                                <Img src={src} alt={`${activeLabel} illustration ${i + 1}`} />
+                                <div className="cb-gallery-overlay"><span>{activeLabel}</span></div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -452,37 +461,46 @@ function Testimonials() {
                 <div className="cb-section-head center">
                     <Eyebrow center>Testimonials</Eyebrow>
                     <motion.h2 variants={maskReveal} initial="hidden" whileInView="visible" viewport={{ once: true }} className="cb-h2 light">
-                        HERE'S WHAT OUR <span className="accent">AUTHORS SAY</span>
+                        WHAT OUR <span className="accent">AUTHORS ARE SAYING</span>
                     </motion.h2>
+                    <p className="cb-sub light">Writers trust us to turn their ideas into polished, memorable illustrations. Here's what authors have shared about working with our team.</p>
                 </div>
 
-                {/* Trustpilot-style summary bar */}
+                {/* Trustpilot-style strip — shows a real rating only when TRUST.verified is true */}
                 <motion.div className="cb-tp-summary" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-                    <span className="cb-tp-label">{TRUST.label}</span>
-                    <TrustStars rating={5} size={30} />
-                    <span className="cb-tp-meta">Rated <strong>{TRUST.score}</strong> / 5 based on <strong>{TRUST.reviews} reviews</strong></span>
-                    <span className="cb-tp-brand"><Star size={20} fill="#03D389" stroke="#03D389" /> Trustpilot</span>
+                    {TRUST.verified ? (
+                        <>
+                            <span className="cb-tp-label">{TRUST.label}</span>
+                            <TrustStars rating={5} size={30} />
+                            <span className="cb-tp-meta">Rated <strong>{TRUST.score}</strong> / 5 based on <strong>{TRUST.reviews} reviews</strong></span>
+                            <span className="cb-tp-brand"><Star size={20} fill="#03D389" stroke="#03D389" /> Trustpilot</span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="cb-tp-label">Client Feedback</span>
+                            <TrustStars rating={5} size={30} />
+                            <span className="cb-tp-meta">Trusted by authors for creativity, communication, and reliable delivery.</span>
+                        </>
+                    )}
                 </motion.div>
 
                 <div className="cb-slider">
                     <div className="cb-slider-track" style={{ transform: `translateX(-${(index * 100) / perView}%)` }}>
-                        {testimonials.map(({ name, location, date, rating, title, quote }) => (
+                        {testimonials.map(({ name, rating, title, quote }) => (
                             <div key={name} className="cb-slide" style={{ flex: `0 0 ${100 / perView}%` }}>
                                 <article className="cb-tp-card">
                                     <header className="cb-tp-head">
                                         <span className="cb-tp-avatar" aria-hidden="true">{name.split(" ").map((n) => n[0]).join("").slice(0, 2)}</span>
                                         <div className="cb-tp-who">
                                             <p className="cb-tp-name">{name}</p>
-                                            <p className="cb-tp-loc">{location} · 1 review</p>
+                                            <p className="cb-tp-loc">Author</p>
                                         </div>
                                     </header>
                                     <div className="cb-tp-rowline">
                                         <TrustStars rating={rating} size={20} />
-                                        <span className="cb-tp-verified"><BadgeCheck size={14} /> Verified</span>
                                     </div>
                                     <h3 className="cb-tp-title">{title}</h3>
                                     <p className="cb-tp-text">{quote}</p>
-                                    <p className="cb-tp-date"><strong>Date of experience:</strong> {date}</p>
                                 </article>
                             </div>
                         ))}
@@ -601,7 +619,7 @@ function Footer() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={IMG.footerLogo} alt={BRAND.name} className="cb-logo-img footer" />
                     </a>
-                    <p>We help children’s authors turn finished manuscripts into professionally published books with expert support for formatting, setup, distribution, and launch preparation.</p>
+                    <p>We help authors transform their ideas into professionally illustrated books with memorable characters, engaging scenes, and artwork created to complement every story.</p>
                 </div>
 
                 <div className="cb-footer-col">
@@ -616,12 +634,12 @@ function Footer() {
                 <div className="cb-footer-col">
                     <p className="cb-footer-h big">Get In Touch</p>
                     <form className="cb-footer-form" onSubmit={submit}>
-                        <input name="name" type="text" placeholder="Your name" required aria-label="Your name" value={form.name} onChange={handle} disabled={loading} />
+                        <input name="name" type="text" placeholder="Your Name" required aria-label="Your Name" value={form.name} onChange={handle} disabled={loading} />
                         <div className="cb-footer-row">
-                            <input name="email" type="email" placeholder="Your email" required aria-label="Your email" value={form.email} onChange={handle} disabled={loading} />
-                            <input name="phone" type="tel" placeholder="Your phone" required aria-label="Your phone" value={form.phone} onChange={handle} disabled={loading} />
+                            <input name="email" type="email" placeholder="Your Email" required aria-label="Your Email" value={form.email} onChange={handle} disabled={loading} />
+                            <input name="phone" type="tel" placeholder="Your Phone" required aria-label="Your Phone" value={form.phone} onChange={handle} disabled={loading} />
                         </div>
-                        <textarea name="message" rows={3} placeholder="Your message" aria-label="Your message" value={form.message} onChange={handle} disabled={loading} />
+                        <textarea name="message" rows={3} placeholder="Tell Us About Your Project" aria-label="Tell Us About Your Project" value={form.message} onChange={handle} disabled={loading} />
                         <button type="submit" className="cb-btn cb-btn-primary" disabled={loading}>
                             {loading ? <><Loader2 size={16} className="cb-spin" /> Sending…</> : <>Send Message <Send size={15} /></>}
                         </button>
@@ -640,7 +658,7 @@ function Footer() {
 /* ══════════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════════ */
-export default function ChildLandingPage() {
+export default function ChildLandingPageIllustration() {
     const agencyRef = useRef<HTMLDivElement>(null);
     const agencyInView = useInView(agencyRef, { once: true, margin: "-100px" });
 
@@ -680,6 +698,7 @@ export default function ChildLandingPage() {
                 .cb-section-head { margin-bottom: 56px; }
                 .cb-section-head.center { text-align: center; max-width: 820px; margin-left: auto; margin-right: auto; }
                 .cb-sub { color: var(--grey); font-size: 15px; line-height: 1.75; margin-top: 18px; }
+                .cb-sub.light { color: rgba(255,255,255,0.6); }
 
                 /* ═══ BUTTONS ═══ */
                 .cb-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
@@ -720,7 +739,7 @@ export default function ChildLandingPage() {
                 .cb-hero-glow { position: absolute; top: 40%; left: 30%; width: 800px; height: 800px; border-radius: 50%; transform: translate(-50%, -50%); background: rgba(232,57,29,0.14); filter: blur(150px); pointer-events: none; }
                 .cb-hero-dots { position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px; pointer-events: none; }
                 .cb-hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; }
-                .cb-hero-h1 { font-weight: 900; color: white; text-transform: uppercase; line-height: 0.98; font-size: clamp(2.8rem, 5.2vw, 4.8rem); margin-bottom: 28px; }
+                .cb-hero-h1 { font-weight: 900; color: white; text-transform: uppercase; line-height: 1; font-size: clamp(2.4rem, 4.2vw, 4rem); margin-bottom: 28px; }
                 .cb-hero-h1 .accent { color: var(--red); display: block; }
                 .cb-hero-h1 .scribble { position: relative; display: inline-block; }
                 .cb-hero-h1 .scribble svg { position: absolute; left: -2%; bottom: -14px; width: 104%; height: 18px; }
@@ -843,7 +862,7 @@ export default function ChildLandingPage() {
                 .cb-slider { overflow: hidden; margin: 0 -12px; }
                 .cb-slider-track { display: flex; transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
                 .cb-slide { padding: 0 12px; }
-                /* Trustpilot-style stars (brand red) */
+                /* Trustpilot-style stars */
                 .cb-tp-stars { display: inline-flex; gap: 3px; }
                 .cb-tp-star { display: inline-flex; align-items: center; justify-content: center; background: #dcdce6; border-radius: 2px; }
                 .cb-tp-star.on { background: #03D389; }
@@ -863,12 +882,8 @@ export default function ChildLandingPage() {
                 .cb-tp-name { font-weight: 800; font-size: 15px; color: #191919; }
                 .cb-tp-loc { font-size: 12px; color: #6c6c85; margin-top: 2px; }
                 .cb-tp-rowline { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
-                .cb-tp-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #6c6c85; }
-                .cb-tp-verified svg { color: #03D389; }
                 .cb-tp-title { font-weight: 800; font-size: 16px; color: #191919; margin-bottom: 8px; line-height: 1.35; }
                 .cb-tp-text { color: #3f3f55; font-size: 14.5px; line-height: 1.7; flex: 1; }
-                .cb-tp-date { font-size: 12px; color: #6c6c85; margin-top: 18px; padding-top: 14px; border-top: 1px solid #efeff4; }
-                .cb-tp-date strong { color: #191919; font-weight: 700; }
                 .cb-dots { display: flex; justify-content: center; gap: 10px; margin-top: 40px; }
                 .cb-dot { width: 10px; height: 10px; border-radius: 999px; border: none; background: rgba(255,255,255,0.25); cursor: pointer; transition: width 0.35s ease, background 0.35s ease; padding: 0; }
                 .cb-dot.active { width: 30px; background: var(--red); }
@@ -973,7 +988,7 @@ export default function ChildLandingPage() {
                     .cb-header-inner { max-width: 1760px; }
                     .cb-footer-inner, .cb-footer-bottom { max-width: 1640px; padding-left: 120px; padding-right: 120px; }
                     .cb-hero { padding: 220px 0 200px; }
-                    .cb-hero-h1 { font-size: clamp(4.5rem, 4.6vw, 7rem); }
+                    .cb-hero-h1 { font-size: clamp(4rem, 4vw, 6rem); }
                     .cb-hero-sub { font-size: 1.2rem; max-width: 640px; }
                     .cb-agency, .cb-portfolio, .cb-why, .cb-process, .cb-testimonials, .cb-final { padding: 160px 0; }
                     .cb-h2 { font-size: clamp(3rem, 3.2vw, 4.4rem); }
@@ -1043,7 +1058,7 @@ export default function ChildLandingPage() {
                     .cb-header-phone-text { display: none; }
                     .cb-header-right { gap: 10px; }
                     .cb-hero { padding: 120px 0 110px; }
-                    .cb-hero-h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+                    .cb-hero-h1 { font-size: clamp(1.9rem, 8.5vw, 2.6rem); }
                     .cb-hero-sub { font-size: 0.9rem; }
                     .cb-hero-perks { gap: 14px; }
                     .cb-form-card { padding: 32px 22px 26px; border-radius: 28px 28px 28px 10px; }
@@ -1067,7 +1082,7 @@ export default function ChildLandingPage() {
                     .cb-step { grid-template-columns: 1fr; gap: 10px; padding: 22px; }
                     .cb-step-num { font-size: 34px; }
                     .cb-tp-card { padding: 20px; }
-                    .cb-tp-summary { padding: 16px; margin-bottom: 32px; }
+                    .cb-tp-summary { padding: 16px; margin-bottom: 32px; text-align: center; }
                     .cb-tp-label { font-size: 18px; }
                     .cb-logo-img { height: 42px; }
                     .cb-tp-text { font-size: 14px; }
@@ -1082,7 +1097,7 @@ export default function ChildLandingPage() {
                 ══════════════════════════════════════════ */
                 @media (max-width: 380px) {
                     .cb-inner, .cb-band-inner, .cb-header-inner { padding: 0 14px; }
-                    .cb-hero-h1 { font-size: 1.75rem; }
+                    .cb-hero-h1 { font-size: 1.65rem; }
                     .cb-h2 { font-size: 1.45rem; }
                     .cb-logo-img { height: 36px; }
                     .cb-gallery { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -1116,26 +1131,26 @@ export default function ChildLandingPage() {
                         <div className="cb-hero-grid">
                             <div className="cb-hero-copy">
                                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
-                                    <Eyebrow>CHILDREN BOOK PUBLISHING</Eyebrow>
+                                    <Eyebrow>Children's Book Illustration</Eyebrow>
                                 </motion.div>
                                 <motion.h1 variants={maskReveal} initial="hidden" animate="visible" className="cb-hero-h1">
-                                    PUBLISH YOUR{" "}
+                                    Bring Your Story To Life With{" "}
                                     <span className="scribble">
-                                        CHILDREN’S 
+                                        Custom
                                         <svg viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true">
                                             <path d="M2 12 C60 2, 120 16, 180 7 S270 4, 298 10" stroke="#ffc83d" strokeWidth="5" fill="none" strokeLinecap="round" />
                                         </svg>
                                     </span>
-                                    <span className="accent">BOOK WITH CONFIDENCE </span>
+                                    <span className="accent">Illustrations</span>
                                 </motion.h1>
                                 <motion.p variants={fadeUp} initial="hidden" animate="visible" className="cb-hero-sub">
-                                    Turn your finished manuscript into a professionally published children’s book. From formatting and cover preparation to ISBN setup and distribution, we help you move from manuscript to marketplace with a clear, guided process.
+                                    Turn your ideas into vibrant, memorable artwork with custom illustrations created specifically for your book. From lovable characters to imaginative scenes, we help make every page visually unforgettable.
                                 </motion.p>
                                 <motion.div variants={fadeUp} initial="hidden" animate="visible"><ActionButtons /></motion.div>
                                 <motion.div className="cb-hero-perks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-                                    <span className="cb-hero-perk"><Sparkles size={16} /> Professional Publishing Support</span>
-                                    <span className="cb-hero-perk"><Timer size={16} /> Print & Digital Setup</span>
-                                    <span className="cb-hero-perk"><ShieldCheck size={16} /> Worldwide Distribution</span>
+                                    <span className="cb-hero-perk"><Sparkles size={16} /> Unlimited Revisions</span>
+                                    <span className="cb-hero-perk"><Timer size={16} /> First Draft in 4–7 Days</span>
+                                    <span className="cb-hero-perk"><ShieldCheck size={16} /> 100% Ownership</span>
                                 </motion.div>
                             </div>
                             <LeadForm />
@@ -1144,7 +1159,7 @@ export default function ChildLandingPage() {
                     <Wave fill="#faf9f7" />
                 </section>
 
-                {/* ═══ SECTION 2: BOOK ILLUSTRATION AGENCY ═══ */}
+                {/* ═══ SECTION 2: CREATIVE ILLUSTRATION STUDIO ═══ */}
                 <section className="cb-agency" ref={agencyRef}>
                     <div className="cb-inner">
                         <div className="cb-agency-grid">
@@ -1159,12 +1174,12 @@ export default function ChildLandingPage() {
                             </motion.div>
 
                             <motion.div variants={staggerContainer} initial="hidden" animate={agencyInView ? "visible" : "hidden"}>
-                                <motion.div variants={fadeUp}><Eyebrow>WHY US</Eyebrow></motion.div>
+                                <motion.div variants={fadeUp}><Eyebrow>Creative Illustration Studio</Eyebrow></motion.div>
                                 <motion.h2 variants={maskReveal} className="cb-h2">
-                                    CHILDREN’S BOOK <span className="accent">PUBLISHING</span> MADE SIMPLE
+                                    CHILDREN'S BOOK ILLUSTRATION <span className="accent">THAT STANDS OUT</span>
                                 </motion.h2>
                                 <motion.p variants={fadeUp} className="cb-agency-body">
-                                    Publishing a children’s book should feel exciting, not overwhelming. Our team helps authors prepare, publish, and distribute their books with professional support at every stage, from final files to worldwide availability.
+                                    Bring your story to life with expressive, professionally crafted illustrations designed for young readers. From character development to full-page scenes, we create artwork that captures the heart of your story and gives your book a polished, memorable look.
                                 </motion.p>
                                 <motion.div variants={staggerContainer} className="cb-feature-grid">
                                     {agencyFeatures.map(({ icon: Icon, title }) => (
@@ -1180,7 +1195,12 @@ export default function ChildLandingPage() {
                 </section>
 
                 {/* ═══ SECTION 3: CTA BAND ═══ */}
-                <CtaBand line="Ready to publish children’s book and share it with readers everywhere?" image={IMG.cta1} imageAlt="Girl reading a picture book" />
+                <CtaBand
+                    line="Ready to turn your story into unforgettable illustrations?"
+                    title="LET'S CREATE SOMETHING AMAZING!"
+                    image={IMG.cta1}
+                    imageAlt="Girl reading a picture book"
+                />
 
                 {/* ═══ SECTION 4: PORTFOLIO ═══ */}
                 <Portfolio />
@@ -1189,12 +1209,11 @@ export default function ChildLandingPage() {
                 <section className="cb-why">
                     <div className="cb-inner">
                         <div className="cb-section-head center">
-                            <Eyebrow center>WHY CHOOSE US</Eyebrow>
+                            <Eyebrow center>Why Choose Us</Eyebrow>
                             <motion.h2 variants={maskReveal} initial="hidden" whileInView="visible" viewport={{ once: true }} className="cb-h2">
-                               WHY AUTHORS CHOOSE OUR <span className="accent">CHILDREN’S BOOK
-PUBLISHING SERVICES</span>
+                                WHY AUTHORS CHOOSE OUR <span className="accent">BOOK ILLUSTRATION SERVICES</span>
                             </motion.h2>
-                            <p className="cb-sub">We make children’s book publishing easier with professional guidance, clear communication, and support at every stage. From preparing your files to making your book available to readers, we help you publish with confidence.</p>
+                            <p className="cb-sub">We combine creativity, collaboration, and professional execution to make the illustration process simple from start to finish. Every detail is shaped around your story, audience, and publishing goals.</p>
                         </div>
                         <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="cb-why-grid">
                             {whyCards.map(({ icon: Icon, title, desc }) => (
@@ -1210,8 +1229,13 @@ PUBLISHING SERVICES</span>
                     </div>
                 </section>
 
-                {/* ═══ SECTION 6: CTA BAND 2 ═══ */}
-                <CtaBand line="Share your ideas with us for best-in-class book illustrations." image={IMG.cta2} imageAlt="Boy standing beside a stack of books" />
+                {/* ═══ SECTION 6: CTA BAND 2 (not covered in the content doc — original copy kept) ═══ */}
+                <CtaBand
+                    line="Share your ideas with us for best-in-class book illustrations."
+                    title="TALK TO US TODAY!"
+                    image={IMG.cta2}
+                    imageAlt="Boy standing beside a stack of books"
+                />
 
                 {/* ═══ SECTION 7: PROCESS ═══ */}
                 <section id="process" className="cb-process">
@@ -1221,9 +1245,9 @@ PUBLISHING SERVICES</span>
                             <div className="cb-process-left">
                                 <Eyebrow>How It Works</Eyebrow>
                                 <motion.h2 variants={maskReveal} initial="hidden" whileInView="visible" viewport={{ once: true }} className="cb-h2 light">
-                                    CHILDREN’S BOOK <span className="accent"> PUBLISHING PROCESS </span>
+                                    OUR BOOK ILLUSTRATION <span className="accent">PROCESS</span>
                                 </motion.h2>
-                                <p className="cb-sub">From manuscript preparation to final publication, our process keeps every step simple, organized, and focused on getting your book ready for readers.</p>
+                                <p className="cb-sub">From your first idea to the final artwork, our process keeps every stage clear, collaborative, and focused on bringing your story to life.</p>
                                 <motion.div className="cb-process-img" initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8, ease: smoothEase }}>
                                     <Img src={IMG.process} alt="Illustrated girl character" />
                                 </motion.div>
@@ -1237,7 +1261,7 @@ PUBLISHING SERVICES</span>
                                     </motion.div>
                                 ))}
                                 <motion.div variants={fadeUp}>
-                                    <button type="button" className="cb-btn cb-btn-primary" onClick={getStarted}>Order Now <ArrowRight size={16} /></button>
+                                    <button type="button" className="cb-btn cb-btn-primary" onClick={getStarted}>Start Your Project <ArrowRight size={16} /></button>
                                 </motion.div>
                             </motion.div>
                         </div>
@@ -1255,12 +1279,11 @@ PUBLISHING SERVICES</span>
                                 <Img src={IMG.finalLeft} alt="Child drawing" />
                             </motion.div>
                             <div className="cb-final-center">
-                                <Eyebrow center>Start Today</Eyebrow>
+                                <Eyebrow center>Start Your Project</Eyebrow>
                                 <motion.h2 variants={maskReveal} initial="hidden" whileInView="visible" viewport={{ once: true }} className="cb-h2">
-                                    GET YOUR CHILDREN’S BOOK <span className="accent">PUBLISHED BY
-OUR EXPERTS</span>
+                                    TURN YOUR STORY INTO <span className="accent">BEAUTIFUL ILLUSTRATIONS</span>
                                 </motion.h2>
-                                <p className="cb-sub">Work with our publishing team to prepare, publish, and distribute your children’s book with professional support at every stage.</p>
+                                <p className="cb-sub">Work with experienced illustrators to create engaging artwork that captures your story, connects with young readers, and gives your book a professional finish.</p>
                                 <ActionButtons dark />
                             </div>
                             <motion.div className="cb-final-img" initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.9, ease: smoothEase }}>
@@ -1269,9 +1292,8 @@ OUR EXPERTS</span>
                         </div>
                     </div>
                 </section>
-
-                <Footer />
                 <CallBar />
+                <Footer />
                 <GetStartedPopup />
             </main>
         </>

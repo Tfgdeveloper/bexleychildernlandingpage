@@ -8,6 +8,7 @@ import {
     CalendarDays, PhoneCall, Trophy, BookOpen, Users, Percent, Crown, ShieldCheck, Handshake,
     FileText, Rocket, Search, Clock, Award,
 } from "lucide-react";
+import CallBar from "./CallBar";
 
 /* ══════════════════════════════════════════════════════════════
    EDIT THESE — contact details, links & image paths
@@ -25,15 +26,17 @@ const BRAND = {
 const MEETING_URL = "";
 
 const IMG = {
-    headerLogo: "/images/Bexley-Publishing-03.png",
-    footerLogo: "/images/Bexley-Publishing-03.png",
-    cta1: "/images/publishing/cta-books-1.png",
-    cta2: "/images/publishing/cta-books-2.png",
-    popup: "/images/page/popup-img.png",
+    headerLogo: "/images/page/Bexley-Publishing-03.png",
+    footerLogo: "/images/page/Bexley-Publishing-03.png",
 };
 
-/* Any image that's missing automatically falls back to a designed "book cover"
-   or a text logo, so the page never looks broken while you add files. */
+/* Book covers: /public/images/01.png … 25.png
+   Change COVER_COUNT if you add more covers (26.png, 27.png …). */
+const COVER_COUNT = 25;
+const cover = (n: number) => `/images/books/${String(((n - 1) % COVER_COUNT) + 1).padStart(2, "0")}.png`;
+
+/* Popup collage: left, front (centre), right */
+const POPUP_COVERS = [20, 21, 22];
 
 /* ══════════════════════════════════════════════════════════════
    LEAD FORM SUBMISSION (CRM) — same as the children's page
@@ -130,6 +133,66 @@ const staggerContainer: Variants = {
     visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
 };
 
+const portfolioCats = ["Fiction", "Fantasy", "Spirituality", "Thriller", "Romance", "Biography", ] as const;
+type PortfolioCat = (typeof portfolioCats)[number];
+
+// Replace these placeholder paths with your real image URLs
+const portfolioData: Record<PortfolioCat, string[]> = {
+    Fiction: [
+        "/images/books/02.png",
+        "/images/books/13.png",
+        "/images/books/18.png",
+        "/images/books/24.png",
+        
+
+    ],
+    Fantasy: [
+        "/images/books/04.png",
+        "/images/books/10.png",
+        "/images/books/21.png",
+        "/images/books/25.png",
+        "/images/books/0.png",
+        "/images/books/0.png",
+    ],
+    Spirituality: [
+        "/images/books/05.png",
+        "/images/books/07.png",
+        "/images/books/15.png",
+        "/images/books/17.png",
+        "/images/books/20.png",
+        "/images/books/0.png",
+    ],
+    Thriller: [
+        "/images/books/03.png",
+        "/images/books/16.png",
+        "/images/books/1.png",
+        "/images/books/1.png",
+        "/images/books/0.png",
+        "/images/books/0.png",
+
+    ],
+    Romance: [
+        "/images/books/01.png",
+        "/images/books/06.png",
+        "/images/books/09.png",
+        "/images/books/22.png",
+        "/images/books/23.png",
+        "/images/books/11.png",
+        
+
+        
+    ],
+    Biography: [
+        "/images/books/08.png",
+        "/images/books/12.png",
+        "/images/books/14.png",
+        "/images/books/19.png",
+        "/images/books/0.png",
+        "/images/books/0.png",
+    ],
+    
+};
+
 /* ══════════════════════════════════════════════════════════════
    ACTIONS
 ══════════════════════════════════════════════════════════════ */
@@ -152,15 +215,6 @@ function bookMeeting() {
 /* ══════════════════════════════════════════════════════════════
    IMAGE HELPERS
 ══════════════════════════════════════════════════════════════ */
-const TONES = [
-    { bg: "linear-gradient(160deg,#e8391d,#8f1c0c)", fg: "#fff", accent: "#ffc83d" },
-    { bg: "linear-gradient(160deg,#1b2340,#05070f)", fg: "#fff", accent: "#e8391d" },
-    { bg: "linear-gradient(160deg,#ffc83d,#f29a1f)", fg: "#05070f", accent: "#e8391d" },
-    { bg: "linear-gradient(160deg,#faf9f7,#e8e1d4)", fg: "#05070f", accent: "#e8391d" },
-    { bg: "linear-gradient(160deg,#2d6f9e,#123049)", fg: "#fff", accent: "#ffc83d" },
-    { bg: "linear-gradient(160deg,#3b2a4f,#140d20)", fg: "#fff", accent: "#e8391d" },
-];
-
 /* Detects images that failed before React hydrated (onError alone misses those) */
 function useImgFallback() {
     const ref = useRef<HTMLImageElement>(null);
@@ -172,21 +226,10 @@ function useImgFallback() {
     return { ref, failed, onError: () => setFailed(true) };
 }
 
-/* Real cover image if it exists, otherwise a designed placeholder cover */
-function BookCover({ src, title, author, tone = 0, className = "" }: { src: string; title: string; author: string; tone?: number; className?: string }) {
-    const { ref, failed, onError } = useImgFallback();
-    if (!failed && src) {
-        // eslint-disable-next-line @next/next/no-img-element
-        return <img ref={ref} src={src} alt={`${title} book cover`} className={`pb-cover ${className}`} loading="lazy" onError={onError} />;
-    }
-    const t = TONES[tone % TONES.length];
-    return (
-        <div className={`pb-cover pb-faux ${className}`} style={{ background: t.bg, color: t.fg }} role="img" aria-label={`${title} book cover`}>
-            <span className="pb-faux-bar" style={{ background: t.accent }} />
-            <strong>{title}</strong>
-            <em>{author}</em>
-        </div>
-    );
+/* Book cover image */
+function BookCover({ src, alt, className = "", eager = false }: { src: string; alt: string; className?: string; eager?: boolean }) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={alt} className={`pb-cover ${className}`} loading={eager ? "eager" : "lazy"} decoding="async" />;
 }
 
 /* Logo image if it exists, otherwise the name as a clean wordmark */
@@ -209,36 +252,27 @@ const slug = (s: string) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0
 /* ══════════════════════════════════════════════════════════════
    DATA
 ══════════════════════════════════════════════════════════════ */
-// Hero shelf: /public/images/publishing/hero/book-1.png … book-8.png
-const heroBooks = [
-    { title: "Holiday", author: "M. Carter" },
-    { title: "The Split", author: "Sharon Bolton" },
-    { title: "Winter Notes", author: "A. Hale" },
-    { title: "Her Husband's Secret", author: "L. Moore" },
-    { title: "Beren & Luthien", author: "R. Vance" },
-    { title: "The Courage of Hope", author: "D. Price" },
-    { title: "Three", author: "K. Lowe" },
-].map((b, i) => ({ ...b, src: `/images/publishing/hero/book-${i + 1}.png` }));
+// Hero shelf: covers 01–07
+const heroBooks = Array.from({ length: 7 }, (_, i) => cover(i + 1));
 
 // Logo strips: /public/images/publishing/platforms/<slug>.png
 const retailers = ["Amazon Kindle", "Barnes & Noble", "Kobo", "Apple Books", "Google Play Books", "Draft2Digital", "IngramSpark", "Smashwords"];
 const reviewSites = ["Trustpilot", "Reviews.io", "Bark", "Sitejabber", "GoodFirms", "Clutch"];
 
+// Genre cards: covers 08–13
 const genres = [
-    { title: "Children's Books", book: "Baby's Story Time", items: ["Cover Design", "eBook", "Illustrations", "Interior Formatting", "Hardcover Printing"] },
-    { title: "Novels", book: "My Father's Words", items: ["Cover Design", "Editing", "Interior Formatting", "Illustrations", "Marketing"] },
-    { title: "Art Books", book: "The Colour Tale", items: ["Cover Design", "Editing", "Interior Formatting", "Printing"] },
-    { title: "Cookbooks", book: "Kitchen Conversations", items: ["Cover Design", "Editing", "Interior Formatting", "Hardcover Printing"] },
-    { title: "Fiction", book: "The Archer's Thread", items: ["Cover Design", "eBook", "Editing", "Interior Formatting"] },
-    { title: "Non-Fiction", book: "Emotions From My Wine Glass", items: ["Cover Design", "eBook", "Editing", "Interior Formatting", "Marketing"] },
-].map((g) => ({ ...g, src: `/images/publishing/genres/${slug(g.title)}.png` }));
+    { title: "Biography", items: ["Cover Design", "eBook", "Illustrations", "Interior Formatting", "Hardcover Printing"] },
+    { title: "Novels", items: ["Cover Design", "Editing", "Interior Formatting", "Illustrations", "Marketing"] },
+    { title: "Fantasy", items: ["Cover Design", "Editing", "Interior Formatting", "Printing"] },
+    { title: "Romance", items: ["Cover Design", "Editing", "Interior Formatting", "Hardcover Printing"] },
+    { title: "Fiction", items: ["Cover Design", "eBook", "Editing", "Interior Formatting"] },
+    { title: "Non-Fiction", items: ["Cover Design", "eBook", "Editing", "Interior Formatting", "Marketing"] },
+].map((g, i) => ({ ...g, src: cover(8 + i) }));
 
 // Award badges: /public/images/publishing/awards/award-1.png … award-6.png
 const awards = Array.from({ length: 6 }, (_, i) => `/images/publishing/awards/award-${i + 1}.png`);
 
-// Portfolio: /public/images/publishing/portfolio/<category>-<n>.webp
-const portfolioCats = ["Comics", "Drama", "Children's Book", "Health", "Horror", "Romance", "Travel", "Law", "Cookbook", "Biography", "History"];
-const sampleTitles = ["The Last Letter", "Beyond the Tide", "Midnight Orchard", "Paper Crowns", "Salt & Stone", "The Quiet Year", "Northbound", "Glass Harbor", "Ember Road"];
+// Portfolio: each tab shows 9 covers, cycling through all 25 so every tab looks different
 
 const services = [
     { icon: PenTool, title: "Ghostwriting", desc: "Professional writers turn your ideas, notes or recordings into a complete manuscript in your voice." },
@@ -305,6 +339,9 @@ function Eyebrow({ children, center = false, light = false }: { children: ReactN
         </div>
     );
 }
+
+
+
 
 function CtaButtons({ onDark = true }: { onDark?: boolean }) {
     return (
@@ -443,14 +480,14 @@ function Hero() {
 
             {/* Book shelf rising from the bottom */}
             <div className="pb-shelf" aria-hidden="true">
-                {heroBooks.map((b, i) => (
+                {heroBooks.map((src, i) => (
                     <motion.div
-                        key={b.title}
+                        key={src}
                         className={`pb-shelf-book b${i + 1}`}
                         initial={{ y: 160, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 1, delay: 0.9 + i * 0.08, ease: smoothEase }}
                     >
-                        <BookCover src={b.src} title={b.title} author={b.author} tone={i} />
+                        <BookCover src={src} alt="" eager />
                     </motion.div>
                 ))}
             </div>
@@ -467,11 +504,11 @@ function Genres() {
             <div className="pb-inner">
                 <SectionHead eyebrow="What we publish" title="Publishing Solutions For" accent="Every Genre" sub="Whatever you're writing, we have editors, designers and marketers who specialize in it." />
                 <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="pb-genre-grid">
-                    {genres.map((g, i) => (
+                    {genres.map((g) => (
                         <motion.article key={g.title} variants={fadeUp} className="pb-genre-card">
                             <div className="pb-genre-art">
                                 <span className="pb-genre-ring" />
-                                <BookCover src={g.src} title={g.book} author="Bexley Author" tone={i + 1} className="pb-genre-cover" />
+                                <BookCover src={g.src} alt={`${g.title} book cover`} className="pb-genre-cover" />
                             </div>
                             <h3 className="pb-genre-title">{g.title}</h3>
                             <ul className="pb-genre-list">
@@ -488,7 +525,7 @@ function Genres() {
 /* ══════════════════════════════════════════════════════════════
    CTA BAND (used twice)
 ══════════════════════════════════════════════════════════════ */
-function CtaBand({ eyebrow, title, text, image, badge }: { eyebrow: string; title: ReactNode; text: string; image: string; badge?: boolean }) {
+function CtaBand({ eyebrow, title, text, covers, badge }: { eyebrow: string; title: ReactNode; text: string; covers: [number, number, number]; badge?: boolean }) {
     return (
         <section className="pb-band">
             <div className="pb-band-bg" aria-hidden="true" />
@@ -504,16 +541,11 @@ function CtaBand({ eyebrow, title, text, image, badge }: { eyebrow: string; titl
                     initial={{ opacity: 0, x: 60 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
                     transition={{ duration: 0.9, ease: smoothEase }}
                 >
-                    <PlainImg
-                        src={image} alt="Books published by Bexley Publishing" className="pb-band-img"
-                        fallback={
-                            <div className="pb-band-stack">
-                                <BookCover src="" title="Love On The Line" author="J. Carson" tone={3} className="s1" />
-                                <BookCover src="" title="Cold Lake" author="Jeff Carson" tone={4} className="s2" />
-                                <BookCover src="" title="Sorry For His Life" author="M. Lane" tone={0} className="s3" />
-                            </div>
-                        }
-                    />
+                    <div className="pb-band-stack">
+                        <BookCover src={cover(covers[0])} alt="Book published by Bexley Publishing" className="s1" />
+                        <BookCover src={cover(covers[1])} alt="Book published by Bexley Publishing" className="s2" />
+                        <BookCover src={cover(covers[2])} alt="Book published by Bexley Publishing" className="s3" />
+                    </div>
                     {badge && (
                         <div className="pb-band-chip">
                             <b>100%</b>
@@ -550,36 +582,56 @@ function AwardsStrip() {
 /* ══════════════════════════════════════════════════════════════
    PORTFOLIO
 ══════════════════════════════════════════════════════════════ */
+
 function Portfolio() {
-    const [active, setActive] = useState(portfolioCats[0]);
-    const items = Array.from({ length: 9 }, (_, i) => ({
-        src: `/images/publishing/portfolio/${slug(active)}-${i + 1}.webp`,
-        title: sampleTitles[(i + portfolioCats.indexOf(active)) % sampleTitles.length],
-    }));
+    const [active, setActive] = useState<PortfolioCat>(portfolioCats[0]);
+    const items = portfolioData[active];
+
     return (
         <section className="pb-portfolio">
             <div className="pb-inner">
                 <SectionHead
-                    eyebrow="Our portfolio" title="Recently We Published" accent="These Books"
+                    eyebrow="Our portfolio"
+                    title="Recently We Published"
+                    accent="These Books"
                     sub="Our portfolio is full of best-sellers. We've handed the copyrights of award-winning titles to their authors around the world, with 100% anonymity."
                 />
+
                 <div className="pb-tabs" role="tablist" aria-label="Book categories">
                     {portfolioCats.map((c) => (
-                        <button key={c} type="button" role="tab" aria-selected={active === c} className={`pb-tab ${active === c ? "active" : ""}`} onClick={() => setActive(c)}>
+                        <button
+                            key={c}
+                            type="button"
+                            role="tab"
+                            aria-selected={active === c}
+                            className={`pb-tab ${active === c ? "active" : ""}`}
+                            onClick={() => setActive(c)}
+                        >
                             {c}
-                            {active === c && <motion.span layoutId="pb-tab-pill" className="pb-tab-pill" transition={{ duration: 0.4, ease: smoothEase }} />}
+                            {active === c && (
+                                <motion.span
+                                    layoutId="pb-tab-pill"
+                                    className="pb-tab-pill"
+                                    transition={{ duration: 0.4, ease: smoothEase }}
+                                />
+                            )}
                         </button>
                     ))}
                 </div>
+
                 <motion.div layout className="pb-gallery">
                     <AnimatePresence mode="popLayout">
-                        {items.map((b, i) => (
+                        {items.map((src, i) => (
                             <motion.div
-                                key={b.src} layout className="pb-gallery-item"
-                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }}
+                                key={`${active}-${i}-${src}`}
+                                layout
+                                className="pb-gallery-item"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.94 }}
                                 transition={{ duration: 0.45, delay: i * 0.03, ease: smoothEase }}
                             >
-                                <BookCover src={b.src} title={b.title} author={active} tone={i} />
+                                <BookCover src={src} alt={`${active} book cover ${i + 1}`} />
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -859,7 +911,19 @@ function GetStartedPopup() {
                             <div className="pb-pop-panel">
                                 <button type="button" className="pb-pop-close" aria-label="Close" onClick={() => setOpen(false)}><X size={20} /></button>
                             </div>
-                            <PlainImg src={IMG.popup} alt="" className="pb-pop-img" fallback={<div className="pb-pop-img pb-pop-fallback"><BookCover src="" title="Your Book Here" author="You" tone={0} /></div>} />
+                            <div className="pb-pop-collage" aria-hidden="true">
+                                {POPUP_COVERS.map((n, i) => (
+                                    <motion.div
+                                        key={n}
+                                        className={`pb-pop-book b${i + 1}`}
+                                        initial={{ opacity: 0, y: 60, rotate: 0 }}
+                                        animate={{ opacity: 1, y: 0, rotate: [-9, 0, 9][i] }}
+                                        transition={{ duration: 0.7, delay: 0.25 + [0.1, 0, 0.2][i], ease: smoothEase }}
+                                    >
+                                        <BookCover src={cover(n)} alt="" eager />
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>
@@ -980,14 +1044,8 @@ export default function PublishingLandingPage() {
                 .pb-form-err svg { flex-shrink: 0; margin-top: 2px; }
                 .pb-form-err.light { color: #fca5a5; background: rgba(232,57,29,0.1); border-color: rgba(232,57,29,0.35); }
 
-                /* ═══ BOOK COVERS (real or placeholder) ═══ */
-                .pb-cover { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 4px 10px 10px 4px; box-shadow: 0 18px 40px rgba(0,0,0,0.35), inset 6px 0 10px -6px rgba(0,0,0,0.4); }
-                .pb-faux { position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 14% 12%; overflow: hidden; }
-                .pb-faux::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 7%; background: rgba(0,0,0,0.18); }
-                .pb-faux-bar { position: absolute; top: 12%; left: 12%; width: 34%; height: 4px; border-radius: 2px; }
-                .pb-faux strong { font-weight: 900; text-transform: uppercase; line-height: 1; font-size: clamp(12px, 1.3vw, 18px); letter-spacing: 0.02em; overflow-wrap: anywhere; }
-                .pb-genre-cover.pb-faux strong, .pb-shelf-book .pb-faux strong { font-size: 13px; }
-                .pb-faux em { font-style: normal; font-size: 10px; font-weight: 600; opacity: 0.75; margin-top: 8px; letter-spacing: 0.08em; text-transform: uppercase; }
+                /* ═══ BOOK COVERS ═══ */
+                .pb-cover { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; background: none; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.3)); }
 
                 /* ═══ HEADER ═══ */
                 .pb-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 0; transition: background 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease; }
@@ -1029,16 +1087,16 @@ export default function PublishingLandingPage() {
                 .pb-hero-form input:focus, .pb-hero-form textarea:focus { outline: none; border-color: var(--red); background: white; }
                 .pb-hero-form input:disabled, .pb-hero-form textarea:disabled, .pb-footer-form input:disabled, .pb-footer-form textarea:disabled { opacity: 0.6; cursor: not-allowed; }
 
-                .pb-shelf { position: relative; z-index: 3; display: flex; align-items: flex-end; justify-content: center; gap: 18px; height: 280px; margin-top: 56px; padding: 0 20px; }
-                .pb-shelf::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: linear-gradient(to top, var(--ink), transparent); pointer-events: none; }
-                .pb-shelf-book { flex: 0 0 auto; width: 150px; height: 220px; }
-                .pb-shelf-book.b1 { width: 160px; height: 240px; transform-origin: bottom; margin-bottom: 40px; }
-                .pb-shelf-book.b2 { height: 200px; }
-                .pb-shelf-book.b3 { width: 130px; height: 170px; }
-                .pb-shelf-book.b4 { width: 180px; height: 260px; }
-                .pb-shelf-book.b5 { width: 130px; height: 175px; }
-                .pb-shelf-book.b6 { height: 205px; }
-                .pb-shelf-book.b7 { width: 160px; height: 240px; margin-bottom: 40px; }
+                .pb-shelf { position: relative; z-index: 3; display: flex; align-items: flex-end; justify-content: center; gap: 22px; height: 340px; margin-top: 56px; padding: 0 20px 24px; box-sizing: content-box; }
+                .pb-shelf::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: linear-gradient(to top, var(--ink), transparent); pointer-events: none; }
+                .pb-shelf-book { flex: 0 0 auto; width: 175px; height: 262px; }
+                .pb-shelf-book.b1 { width: 185px; height: 278px; margin-bottom: 40px; }
+                .pb-shelf-book.b2 { width: 160px; height: 240px; }
+                .pb-shelf-book.b3 { width: 138px; height: 207px; }
+                .pb-shelf-book.b4 { width: 215px; height: 322px; }
+                .pb-shelf-book.b5 { width: 138px; height: 207px; }
+                .pb-shelf-book.b6 { width: 165px; height: 248px; }
+                .pb-shelf-book.b7 { width: 185px; height: 278px; margin-bottom: 40px; }
 
                 /* ═══ LOGO MARQUEE ═══ */
                 .pb-marquee { background: white; border-bottom: 1px solid var(--line); overflow: hidden; padding: 26px 0; }
@@ -1059,10 +1117,10 @@ export default function PublishingLandingPage() {
                 .pb-genre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
                 .pb-genre-card { background: white; border: 1px solid var(--line); border-radius: 20px; padding: 32px 28px 30px; text-align: center; transition: border-color 0.3s ease, box-shadow 0.4s ease, transform 0.4s ease; }
                 .pb-genre-card:hover { border-color: rgba(232,57,29,0.35); box-shadow: 0 22px 50px rgba(0,0,0,0.1); transform: translateY(-4px); }
-                .pb-genre-art { position: relative; height: 210px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-                .pb-genre-ring { position: absolute; width: 190px; height: 190px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,200,61,0.35), rgba(232,57,29,0.12)); border: 2px dashed rgba(232,57,29,0.3); transition: transform 0.8s ease; }
+                .pb-genre-art { position: relative; height: 290px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+                .pb-genre-ring { position: absolute; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255,200,61,0.35), rgba(232,57,29,0.12)); border: 2px dashed rgba(232,57,29,0.3); transition: transform 0.8s ease; }
                 .pb-genre-card:hover .pb-genre-ring { transform: rotate(40deg) scale(1.05); }
-                .pb-genre-cover { position: relative; width: 130px !important; height: 190px !important; transform: rotate(-4deg); transition: transform 0.5s ease; }
+                .pb-genre-cover { position: relative; width: 180px !important; height: 270px !important; transform: rotate(-4deg); transition: transform 0.5s ease; }
                 .pb-genre-card:hover .pb-genre-cover { transform: rotate(0deg) translateY(-6px); }
                 .pb-genre-title { font-weight: 900; font-size: 17px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; }
                 .pb-genre-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -1079,12 +1137,11 @@ export default function PublishingLandingPage() {
                 .pb-band-h2 .accent { color: var(--red); }
                 .pb-band-text { color: rgba(255,255,255,0.65); font-size: 15px; line-height: 1.8; max-width: 560px; margin-bottom: 32px; }
                 .pb-band-art { position: relative; align-self: stretch; display: flex; align-items: center; justify-content: center; }
-                .pb-band-img { max-width: 100%; max-height: 420px; object-fit: contain; filter: drop-shadow(0 30px 40px rgba(0,0,0,0.5)); }
-                .pb-band-stack { position: relative; width: 340px; height: 320px; }
-                .pb-band-stack .pb-cover { position: absolute; width: 170px; height: 250px; }
-                .pb-band-stack .s1 { left: 0; top: 40px; transform: rotate(-8deg); }
-                .pb-band-stack .s2 { left: 90px; top: 0; z-index: 2; }
-                .pb-band-stack .s3 { left: 170px; top: 50px; transform: rotate(8deg); }
+                .pb-band-stack { position: relative; width: 430px; height: 400px; }
+                .pb-band-stack .pb-cover { position: absolute; width: 215px; height: 322px; }
+                .pb-band-stack .s1 { left: 0; top: 55px; transform: rotate(-8deg); }
+                .pb-band-stack .s2 { left: 108px; top: 0; z-index: 2; }
+                .pb-band-stack .s3 { left: 215px; top: 65px; transform: rotate(8deg); }
                 .pb-band-chip { position: absolute; left: 4%; bottom: 14%; z-index: 3; display: flex; align-items: center; gap: 10px; background: white; border-radius: 14px; padding: 12px 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
                 .pb-band-chip b { color: var(--red); font-weight: 900; font-size: 30px; line-height: 1; }
                 .pb-band-chip span { font-size: 11px; font-weight: 700; line-height: 1.3; color: var(--ink); }
@@ -1105,8 +1162,8 @@ export default function PublishingLandingPage() {
                 .pb-tab:hover { color: var(--red); }
                 .pb-tab.active { color: white; }
                 .pb-tab-pill { position: absolute; inset: 0; background: var(--red); border-radius: 999px; z-index: -1; }
-                .pb-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 56px; max-width: 820px; margin: 0 auto; }
-                .pb-gallery-item { aspect-ratio: 2/3; transition: transform 0.5s ease; }
+                .pb-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 24px; max-width: 1020px; margin: 0 auto; }
+                .pb-gallery-item { aspect-ratio: 2/2; transition: transform 0.5s ease; }
                 .pb-gallery-item:hover { transform: translateY(-8px) rotate(-1deg); }
 
                 /* ═══ SERVICES ═══ */
@@ -1246,15 +1303,21 @@ export default function PublishingLandingPage() {
                 .pb-pop-submit:hover:not(:disabled) { background: white; color: var(--red); }
                 .pb-pop-submit:disabled { opacity: 0.75; cursor: wait; }
                 .pb-pop-art { position: relative; height: 460px; margin-left: -60px; align-self: center; z-index: 1; }
-                .pb-pop-panel { position: absolute; top: -40px; right: 0; width: 290px; height: 400px; border-radius: 4px; background: var(--ink); border: 1px solid rgba(232,57,29,0.35); background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 18px 18px; box-shadow: 0 30px 70px rgba(0,0,0,0.35); }
+                .pb-pop-panel { position: absolute; top: -40px; right: 0; width: 200px; height: 200px; border-radius: 4px; background: var(--ink); border: 1px solid rgba(232,57,29,0.35); background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 18px 18px; box-shadow: 0 30px 70px rgba(0,0,0,0.35); }
                 .pb-pop-close { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; background: transparent; color: white; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
                 .pb-pop-close:hover { background: var(--red); }
-                .pb-pop-img { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom center; z-index: 2; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35)); }
-                .pb-pop-fallback { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 20px; }
-                .pb-pop-fallback .pb-cover { width: 220px; height: 330px; transform: rotate(-4deg); }
+                .pb-pop-collage { position: absolute; inset: 0; z-index: 2; }
+                .pb-pop-book { position: absolute; width: 180px; height: 240px; transform-origin: bottom center; }
+                .pb-pop-book.b1 { left: 72px; bottom: 80px; z-index: 1; }
+                .pb-pop-book.b2 { left: 158px; bottom: 26px; width: 200px; height: 300px; z-index: 3; }
+                .pb-pop-book.b3 { left: 268px; bottom: 90px; z-index: 2; }
+                .pb-pop-book .pb-cover { filter: drop-shadow(0 24px 30px rgba(0,0,0,0.55)); }
                 @media (max-height: 640px) {
                     .pb-pop-art { height: 380px; }
-                    .pb-pop-panel { height: 330px; }
+                    .pb-pop-panel { height: 200px; }
+                    .pb-pop-book { width: 135px; height: 202px; }
+                    .pb-pop-book.b2 { left: 150px; width: 165px; height: 247px; }
+                    .pb-pop-book.b3 { left: 258px; }
                     .pb-pop-form textarea { min-height: 60px; height: 60px; }
                 }
                 @media (max-width: 1023px) { .pb-pop-backdrop { display: none; } }
@@ -1276,11 +1339,15 @@ export default function PublishingLandingPage() {
                     .pb-h2 { font-size: clamp(3rem, 3.2vw, 4.4rem); }
                     .pb-sub, .pb-band-text, .pb-why-list li, .pb-tp-text, .pb-faq-a p { font-size: 17px; }
                     .pb-btn { font-size: 13px; padding: 18px 30px; }
-                    .pb-gallery { max-width: 1100px; }
+                    .pb-gallery { max-width: 1300px; }
                     .pb-pop { grid-template-columns: auto 400px 460px; }
                     .pb-pop-h { width: 440px; font-size: 28px; }
                     .pb-pop-art { height: 560px; }
                     .pb-pop-panel { width: 350px; height: 490px; }
+                    .pb-pop-book { width: 195px; height: 292px; }
+                    .pb-pop-book.b1 { left: 76px; }
+                    .pb-pop-book.b2 { left: 180px; width: 245px; height: 367px; }
+                    .pb-pop-book.b3 { left: 318px; }
                 }
 
                 /* ══════════════════════════════════════════
@@ -1321,9 +1388,9 @@ export default function PublishingLandingPage() {
                 ══════════════════════════════════════════ */
                 @media (max-width: 900px) {
                     .pb-hero { padding-top: 140px; }
-                    .pb-shelf { height: 220px; gap: 12px; margin-top: 44px; }
-                    .pb-shelf-book { width: 110px !important; height: 160px !important; }
-                    .pb-shelf-book.b4 { width: 130px !important; height: 190px !important; }
+                    .pb-shelf { height: 260px; gap: 14px; margin-top: 44px; }
+                    .pb-shelf-book { width: 130px !important; height: 195px !important; }
+                    .pb-shelf-book.b4 { width: 155px !important; height: 232px !important; }
                     .pb-shelf-book.b3, .pb-shelf-book.b5 { display: none; }
                     .pb-genres, .pb-portfolio, .pb-services, .pb-process, .pb-why, .pb-testimonials, .pb-faq { padding: 88px 0; }
                     .pb-gallery { gap: 28px 32px; }
@@ -1344,16 +1411,16 @@ export default function PublishingLandingPage() {
                     .pb-hero-sub { font-size: 0.9rem; margin-bottom: 30px; }
                     .pb-hero-form { grid-template-columns: 1fr; padding: 12px; }
                     .pb-hero-form-offer p { font-size: 18px; }
-                    .pb-shelf { height: 170px; gap: 10px; }
-                    .pb-shelf-book { width: 88px !important; height: 130px !important; }
-                    .pb-shelf-book.b4 { width: 104px !important; height: 150px !important; }
+                    .pb-shelf { height: 200px; gap: 10px; }
+                    .pb-shelf-book { width: 100px !important; height: 150px !important; }
+                    .pb-shelf-book.b4 { width: 120px !important; height: 180px !important; }
                     .pb-h2 { font-size: clamp(1.6rem, 7vw, 2.2rem); }
                     .pb-section-head { margin-bottom: 36px; }
                     .pb-genres, .pb-portfolio, .pb-services, .pb-process, .pb-why, .pb-testimonials, .pb-faq { padding: 64px 0; }
                     .pb-genre-grid, .pb-service-grid, .pb-process-row { grid-template-columns: 1fr; }
                     .pb-actions { flex-direction: column; align-items: stretch; width: 100%; }
                     .pb-actions .pb-btn { width: 100%; }
-                    .pb-band-stack { transform: scale(0.8); }
+                    .pb-band-stack { transform: scale(0.72); margin: -50px 0; }
                     .pb-tabs { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; margin: 0 -20px 32px; padding: 0 20px 6px; scrollbar-width: none; }
                     .pb-tabs::-webkit-scrollbar { display: none; }
                     .pb-tab { white-space: nowrap; flex-shrink: 0; }
@@ -1395,7 +1462,7 @@ export default function PublishingLandingPage() {
                     eyebrow="Share your legacy with"
                     title={<>Proficient Self Book <span className="accent">Publishing Services!</span></>}
                     text="We offer editing, design, marketing and distribution to help you create a beautiful, high-quality book — and get it into readers' hands."
-                    image={IMG.cta1}
+                    covers={[14, 15, 16]}
                     badge
                 />
                 <AwardsStrip />
@@ -1405,7 +1472,7 @@ export default function PublishingLandingPage() {
                     eyebrow="Your story deserves readers"
                     title={<>Start Your Publishing <span className="accent">Journey Today!</span></>}
                     text="Get complete publishing services under one roof. Our distribution network and marketing expertise put your book in the hands of readers worldwide."
-                    image={IMG.cta2}
+                    covers={[17, 18, 19]}
                 />
                 <Marquee items={[...retailers].reverse()} dark label="Distribution partners" />
                 <Process />
@@ -1413,6 +1480,7 @@ export default function PublishingLandingPage() {
                 <Testimonials />
                 <Faq />
                 <Footer />
+                <CallBar />
                 <GetStartedPopup />
             </main>
         </>
