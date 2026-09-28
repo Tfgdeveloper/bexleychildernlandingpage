@@ -143,6 +143,8 @@ const portfolioData: Record<PortfolioCat, string[]> = {
         "/images/books/13.png",
         "/images/books/18.png",
         "/images/books/24.png",
+        "/images/books/30.png",
+        "/images/books/36.png",
         
 
     ],
@@ -151,8 +153,8 @@ const portfolioData: Record<PortfolioCat, string[]> = {
         "/images/books/10.png",
         "/images/books/21.png",
         "/images/books/25.png",
-        "/images/books/0.png",
-        "/images/books/0.png",
+        "/images/books/31.png",
+        "/images/books/32.png",
     ],
     Spirituality: [
         "/images/books/05.png",
@@ -160,15 +162,15 @@ const portfolioData: Record<PortfolioCat, string[]> = {
         "/images/books/15.png",
         "/images/books/17.png",
         "/images/books/20.png",
-        "/images/books/0.png",
+        "/images/books/26.png",
     ],
     Thriller: [
         "/images/books/03.png",
         "/images/books/16.png",
-        "/images/books/1.png",
-        "/images/books/1.png",
-        "/images/books/0.png",
-        "/images/books/0.png",
+        "/images/books/27.png",
+        "/images/books/35.png",
+        "/images/books/33.png",
+        "/images/books/34.png",
 
     ],
     Romance: [
@@ -187,8 +189,8 @@ const portfolioData: Record<PortfolioCat, string[]> = {
         "/images/books/12.png",
         "/images/books/14.png",
         "/images/books/19.png",
-        "/images/books/0.png",
-        "/images/books/0.png",
+        "/images/books/28.png",
+        "/images/books/29.png",
     ],
     
 };
